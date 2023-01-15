@@ -1,0 +1,14 @@
+dataset
+model_checkpoints
+
+outputs
+wandb
+ray_results
+notebooks
+tmp
+
+__pycache__
+*.py[cz]
+
+.vscode
+.env
