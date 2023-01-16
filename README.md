@@ -47,6 +47,7 @@ model_checkpoints
 To train with the best hyperparameters, run the following command:
 
 ```bash
+MODEL_DIR = # where to save the model
 python main.py -mode train \
 	--config_path model_checkpoints/preset_configs/best.json \
 	--model_dir $MODEL_DIR --log_file $MODEL_DIR/log.log \
@@ -144,7 +145,7 @@ python main.py -mode train \
 	--exp_group_name debug \  # saves exp log to wandb
 	--batch_size 10 --epochs 4 \
 	--is_policy_optimization false \
-	--ckpt none --kl_loss_coeff 0.0
+	--ckpt none
 ```
 
 ## Training with LM Only

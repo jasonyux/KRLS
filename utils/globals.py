@@ -42,7 +42,7 @@ class _MTTOD_CONFIG:
 	model_dir = "model_checkpoints/mttod_cp/my"
 	seed = 42
 	deterministic = False
-	ckpt = None
+	ckpt = "model_checkpoints/ppotod/baseline/ckpt-epoch8"
 	log_file = None
 	log_frequency = 100
 	max_to_keep_ckpt = 2
@@ -81,7 +81,7 @@ class _PPOTOD_CONFIG:
 	precompute_kl_logits = False  # switched to using TinyDB which saves memory
 	precompute_db_path = "model_checkpoints/ppotod/precompute/baseline"
 	kl_ckpt = "model_checkpoints/ppotod/baseline/ckpt-epoch8"
-	kl_loss_coeff = 0.1
+	kl_loss_coeff = 0.01
 	use_lm = True   # should we use LM Loss in our learning loop?
 	use_ppo = True  # if use_ppo is False and use lm is True, then it is basically a baseline with only LM
 	is_policy_optimization = None  # if None then it is set to (self.cfg.use_ppo and not self.cfg.use_lm), else it is set to this value
@@ -150,7 +150,7 @@ class _PPOTOD_CONFIG:
 	seed = 42
 	dropout = 0.1  # model dropout
 	deterministic = False
-	ckpt = None
+	ckpt = "model_checkpoints/ppotod/baseline/ckpt-epoch8"
 	log_file = None
 	log_frequency = 100
 	max_to_keep_ckpt = 3
@@ -191,7 +191,7 @@ class _PGTOD_CONFIG:
 	precompute_kl_logits = False  # switched to using TinyDB which saves memory
 	precompute_db_path = "model_checkpoints/ppotod/precompute/baseline"
 	kl_ckpt = "model_checkpoints/ppotod/baseline/ckpt-epoch8"
-	kl_loss_coeff = 0.1
+	kl_loss_coeff = 0.01
 	use_lm = True   # should we use LM Loss in our learning loop?
 	use_ppo = True  # if use_ppo is False and use lm is True, then it is basically a baseline with only LM
 	is_policy_optimization = None  # if None then it is set to (self.cfg.use_ppo and not self.cfg.use_lm), else it is set to this value
@@ -261,7 +261,7 @@ class _PGTOD_CONFIG:
 	seed = 42
 	dropout = 0.1  # model dropout
 	deterministic = False
-	ckpt = None
+	ckpt = "model_checkpoints/ppotod/baseline/ckpt-epoch8"
 	log_file = None
 	log_frequency = 100
 	max_to_keep_ckpt = 3

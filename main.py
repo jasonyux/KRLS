@@ -68,26 +68,7 @@ def update_necessary_fields(args, run):
 	run.config['token_embedding_path'] = args.token_embedding_path
 	run.config['kl_ckpt'] = args.kl_ckpt
 	run.config['ckpt'] = args.ckpt
-
-	run.config['save_model'] = args.save_model
-	run.config['max_to_keep_ckpt'] = args.max_to_keep_ckpt
-	run.config['pilot_run'] = False
-	run.config['debug'] = args.debug
-	run.config['batch_size'] = args.batch_size
-	run.config['epochs'] = args.epochs
-	run.config['exp_group_name'] = args.exp_group_name
-	run.config['save_val_predictions'] = args.save_val_predictions
-	run.config['score_each_dialog'] = args.score_each_dialog
-
-	run.config['reward'] = args.reward
 	run.config['use_ppo'] = args.use_ppo
-	run.config['use_lm'] = args.use_lm
-	run.config['alternate_step_k'] = args.alternate_step_k
-	run.config['num_per_sample'] = args.num_per_sample
-	run.config['terminal_reward_fn'] = args.terminal_reward_fn
-	run.config['is_policy_optimization'] = args.is_policy_optimization
-	run.config['use_true_curr_aspn'] = args.use_true_curr_aspn
-	run.config['kl_loss_coeff'] = args.kl_loss_coeff
 	return run
 
 def get_arg_configs(cfg:_MTTOD_CONFIG, parser:argparse.ArgumentParser):
