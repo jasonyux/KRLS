@@ -68,19 +68,25 @@ model_checkpoints
 
 # Evaluation
 
-We use the [standard multi-woz evaluation script](https://github.com/Tomiinek/MultiWOZ_Evaluation) to evaluate the predictions.
+We use the [standard multi-woz evaluation script](https://github.com/Tomiinek/MultiWOZ_Evaluation) to evaluate the predictions. You can find the predictions for our best checkpoints in the `outputs` folder:
+```bash
+outputs/
+├── krls-e2e.json  # E2E response generation in MultiWoZ
+├── krls-policy.json  # policy optimization in MultiWoZ
+└── krls-gold_dst_n_act.json  # additional exp using both gold DST and SYS ACT
+```
 
-For example, to evaluate the best checkpoint:
+To generate predictions and evaluate a checkpoint manually (e.g. using the best checkpoint):
 ```bash
 CKPT_DIR = model_checkpoints/ppotod_reprod/best/ckpt-epoch2
 ```
 
-1. to generate predictions (E2E response generation) from a checkpoint path:
+1. to generate E2E response from a checkpoint path:
 	```bash
 	python main.py -mode predict \
 		--ckpt $CKPT_DIR --version 2.2 \
-		--output $CKPT_DIR/preds_4.json \
-		--batch_size 4 \
+		--output $CKPT_DIR/preds.json \
+		--batch_size 8 \  # larger batch size will be faster
 		--use_true_curr_aspn false \
 		--is_policy_optimization false
 	```
@@ -88,8 +94,8 @@ CKPT_DIR = model_checkpoints/ppotod_reprod/best/ckpt-epoch2
 	```bash
 	python main.py -mode predict \
 		--ckpt $CKPT_DIR --version 2.2 \
-		--output $CKPT_DIR/preds_4.json \
-		--batch_size 4 \
+		--output $CKPT_DIR/preds.json \
+		--batch_size 8 \
 		--use_true_curr_aspn false \
 		--is_policy_optimization true
 	```
@@ -97,14 +103,14 @@ CKPT_DIR = model_checkpoints/ppotod_reprod/best/ckpt-epoch2
 	```bash
 	python main.py -mode predict \
 		--ckpt $CKPT_DIR --version 2.2 \
-		--output $CKPT_DIR/preds_4.json \
-		--batch_size 4 \
+		--output $CKPT_DIR/preds.json \
+		--batch_size 8 \
 		--use_true_curr_aspn true \
 		--is_policy_optimization true
 	```
 2. to evaluate the predictions:
 	```bash
-	python evaluate.py -input $CKPT_DIR/preds_4.json
+	python evaluate.py -input $CKPT_DIR/preds.json
 	```
 
 # Other Experiments
