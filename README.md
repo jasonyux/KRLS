@@ -36,7 +36,7 @@ In our experiments, we also train from a LM-finetuned checkpoint of GODEL-base, 
 model_checkpoints
 ├── godel_cp
 └── ppotod
-    └──baseline # here
+	└──baseline # here
 		├── ckpt-epoch8
 		├── log.log
 		└── run_config.json
@@ -47,7 +47,7 @@ model_checkpoints
 To train with the best hyperparameters, run the following command:
 
 ```bash
-MODEL_DIR = # where to save the model
+MODEL_DIR= # where to save the model
 python main.py -mode train \
 	--config_path model_checkpoints/preset_configs/best.json \
 	--model_dir $MODEL_DIR --log_file $MODEL_DIR/log.log \
@@ -78,7 +78,7 @@ outputs/
 
 To generate predictions and evaluate a checkpoint manually (e.g. using the best checkpoint):
 ```bash
-CKPT_DIR = model_checkpoints/ppotod_reprod/best/ckpt-epoch2
+CKPT_DIR=model_checkpoints/ppotod_reprod/best/ckpt-epoch2
 ```
 
 1. to generate E2E response from a checkpoint path:

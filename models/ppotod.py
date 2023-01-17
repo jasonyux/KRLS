@@ -27,6 +27,7 @@ class T5WithResponsePPO(T5WithTokenSpan):
 			torch.nn.ReLU(),
 			torch.nn.Linear(self.config.d_model, 1)
 		)
+		# TODO: not used
 		self.action_value_function = type(self.lm_head)(
 			self.config.d_model, self.config.vocab_size, bias=False)
 	

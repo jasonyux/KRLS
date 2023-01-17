@@ -321,16 +321,13 @@ class MTTODTrainer(BaseTrainer):
 				"train", self.cfg.batch_size, self.cfg.num_gpus, shuffle=True, seed=self.cfg.seed
 			)
 		dev_batches, num_steps, _, _ = self.iterator.get_batches(
-			"dev", self.cfg.batch_size, self.cfg.num_gpus, shuffle=False, seed=self.cfg.seed)		
-		test_batches, _, _, _ = self.test_iterator.get_batches(
-			"test", self.cfg.batch_size, self.cfg.num_gpus, excluded_domains=self.cfg.excluded_domains)
+			"dev", self.cfg.batch_size, self.cfg.num_gpus, shuffle=False, seed=self.cfg.seed)
 		
 		if self.cfg.debug or self.cfg.pilot_run:
 			multiplier = 2 if self.cfg.batch_size < 8 else 1
 			cut_off = 5 if self.cfg.debug else 50
 			cut_off *= multiplier
 			dev_batches = dev_batches[:cut_off]
-			test_batches = test_batches[:cut_off]
 			
 			num_steps = 0
 			dev_iterator = self.iterator.get_data_iterator(
@@ -362,7 +359,7 @@ class MTTODTrainer(BaseTrainer):
 				train_results = self.get_score_per_dialog(train_results)
 			
 			# test multiwoz score
-			test_results = self.predict_batches(test_batches, keep_raw=True)
+			test_results = self.predict_batches(dev_batches, keep_raw=True)
 			test_score = self.__evaluator.evaluate(copy.deepcopy(test_results))  # evaluator will modify results
 			test_score['total_score'] = test_score['bleu']['mwz22'] + (test_score['success']['inform']['total'] + test_score['success']['success']['total']) / 2.0
 
