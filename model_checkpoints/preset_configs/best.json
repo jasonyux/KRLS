@@ -24,7 +24,7 @@
     "precompute_db_path": "model_checkpoints/ppotod/precompute/baseline",
     "kl_ckpt": "model_checkpoints/ppotod/baseline/ckpt-epoch8",
     "kl_loss_coeff": 0.01,
-    "use_lm": true,
+    "use_sl": true,
     "use_ppo": true,
     "is_policy_optimization": false,
     "freeze_encoder": false,

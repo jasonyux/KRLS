@@ -30,7 +30,7 @@ model_checkpoints
     └── GODEL-Base # here
 ```
 
-In our experiments, we also train from a LM-finetuned checkpoint of GODEL-base, which you can download from [HERE](https://drive.google.com/file/d/1EjBOAIGpAjbgKSsUB4dTVdiHwE2SzL0v/view?usp=sharing). **This will be used for model training later**. Place the downloaded weights and place them under the `model_checkpoints` folder like this:
+In our experiments, we also train from a SL-finetuned checkpoint of GODEL-base, which you can download from [HERE](https://drive.google.com/file/d/1EjBOAIGpAjbgKSsUB4dTVdiHwE2SzL0v/view?usp=sharing). **This will be used for model training later**. Place the downloaded weights and place them under the `model_checkpoints` folder like this:
 
 ```bash
 model_checkpoints
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
 ## Training from Scratch/Backbone
 
-To train from the backbone instead of the LM-finetuned checkpoint:
+To train from the backbone (`--ckpt none`) instead of the SL-finetuned checkpoint:
 ```bash
 python main.py -mode train \
 	--config_path model_checkpoints/preset_configs/best.json \
@@ -154,20 +154,41 @@ python main.py -mode train \
 	--ckpt none
 ```
 
-## Training with LM Only
+## Training with SL Only
 
-You can train with only performing LM by switching off the ppo training. For example:
+You can train with only performing SL by switching off the ppo training. For example:
 ```bash
 python main.py -mode train \
 	--config_path model_checkpoints/preset_configs/best.json \
 	--model_dir $MODEL_DIR --log_file $MODEL_DIR/log.log \
 	--exp_group_name debug \  # saves exp log to wandb
-	--batch_size 10 --epochs 4 \
+	--batch_size 4 --epochs 10 \
 	--is_policy_optimization false \
 	--ckpt none --kl_loss_coeff 0.0 \
 	--use_ppo false
 ```
-finetunes the backbone only using the LM objective.
+finetunes from backbone only using the SL objective (`--kl_loss_coeff 0.0` and `--use_ppo false`).
+
+## Training with standard RL
+
+You can train with standard RL + auto-regressive generation by first uncommenting the following line in `main.py`:
+```python
+if __name__ == "__main__":
+	# train with PPO
+	# cfg, trainer = train_ppotod()
+	# train with real RL only
+	cfg, trainer = train_realrl_tod()  # this line
+```
+Then train with switching off SL training, per-token reward, and use all terminal reward (see last line):
+```bash
+python main.py -mode train \
+	--config_path model_checkpoints/preset_configs/best.json \
+	--model_dir $MODEL_DIR --log_file $MODEL_DIR/log.log \
+	--exp_group_name debug \  # saves exp log to wandb
+	--batch_size 4 --epochs 4 \
+	--is_policy_optimization false \
+	--use_sl false --reward zeros --terminal_reward_fn all
+```
 
 ## Parameter Tuning
 

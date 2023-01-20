@@ -907,12 +907,8 @@ class MTTODTrainer(BaseTrainer):
 
 	def predict(self):
 		self.model.eval()
-
-		iterator = self.iterator
-		if self.test_iterator is not None:
-			iterator = self.test_iterator
 		
-		pred_batches, _, _, _ = iterator.get_batches(
+		pred_batches, _, _, _ = self.iterator.get_batches(
 			self.cfg.pred_data_type, self.cfg.batch_size,
 			self.cfg.num_gpus, excluded_domains=self.cfg.excluded_domains)
 

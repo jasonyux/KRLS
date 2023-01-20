@@ -30,7 +30,7 @@ def update_config(args: dict):
 	DEFAULT_CFG.log_file = f"{model_base_dir}/ppotod/debug/log.log"
 	DEFAULT_CFG.token_embedding_path = f"{model_base_dir}/ppotod/embeddings/baseline_embedding_layer.pt"
 	DEFAULT_CFG.alternate_epoch = False
-	DEFAULT_CFG.use_lm = True
+	DEFAULT_CFG.use_sl = True
 	DEFAULT_CFG.use_ppo = True
 	DEFAULT_CFG.reward = "token_prob"
 	DEFAULT_CFG.add_kl_divergence = True  # required by above
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 		"alternate_step_k": tune.grid_search([0.1, 1.0]),  # in pilot_sweep_2, 0.5 seems to work better
 		"update_old_policy_interval": tune.choice([1]),
 		"num_per_sample": tune.grid_search([3]),
-		# "use_lm": tune.choice([False]),
+		# "use_sl": tune.choice([False]),
 		"is_policy_optimization": tune.choice([False]),
 	}
 

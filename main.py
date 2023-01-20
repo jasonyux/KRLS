@@ -56,7 +56,7 @@ def update_necessary_fields(args, run):
 		You are probably changing those for ablation study:
 		reward: {run.config['reward']} to {args.reward}
 		use_ppo: {run.config['use_ppo']} to {args.use_ppo}
-		use_lm: {run.config['use_lm']} to {args.use_lm}
+		use_sl: {run.config['use_sl']} to {args.use_sl}
 		alternate_step_k: {run.config['alternate_step_k']} to {args.alternate_step_k}
 		num_per_sample: {run.config['num_per_sample']} to {args.num_per_sample}
 		terminal_reward_fn: {run.config['terminal_reward_fn']} to {args.terminal_reward_fn}
@@ -69,6 +69,9 @@ def update_necessary_fields(args, run):
 	run.config['kl_ckpt'] = args.kl_ckpt
 	run.config['ckpt'] = args.ckpt
 	run.config['use_ppo'] = args.use_ppo
+	run.config['use_sl'] = args.use_sl
+	run.config['reward'] = args.reward
+	run.config['terminal_reward_fn'] = args.terminal_reward_fn
 	return run
 
 def get_arg_configs(cfg:_MTTOD_CONFIG, parser:argparse.ArgumentParser):
@@ -175,29 +178,29 @@ def train_mttod():
 
 def add_ppotod_arg_configs(cfg: _PPOTOD_CONFIG, parser: argparse.ArgumentParser):
 	parser.add_argument('--dropout', type=float, required=False, default=cfg.dropout)
-	parser.add_argument('--ppo_epoch', type=int, default=cfg.ppo_epoch, help="number of ppo epochs per lm epoch, or steps per lm steps")
+	parser.add_argument('--ppo_epoch', type=int, default=cfg.ppo_epoch, help="number of ppo epochs per SL epoch, or steps per SL steps")
 	parser.add_argument('--adv_use_returns', type=str2bool, default=cfg.adv_use_returns, help="use returns as advantage, and value loss is zero")
 	parser.add_argument('--normalize_return', type=str2bool, default=cfg.normalize_return, help="'normalize' return by dividing the number of elements in a batch")
 	parser.add_argument('--real_normalize_return', type=str2bool, default=cfg.real_normalize_return, help="normalize returns to have zero mean and unit variance")
 	parser.add_argument('--use_gold_prob', type=float, default=cfg.use_gold_prob, help="probability of using gold response during data collection")
 	parser.add_argument('--add_gold_demonstrations', type=str2bool, default=cfg.add_gold_demonstrations, help="use gold demonstrations in addition to collected experiences")
 	parser.add_argument('--update_old_policy_interval', type=int, default=cfg.update_old_policy_interval, help="how often to update old policy in terms of epochs")
-	parser.add_argument('--use_ppo', type=str2bool, default=cfg.use_ppo, help="if use_ppo=False, and use_lm is True, then it is just a lm hence a baseline")
-	parser.add_argument('--use_lm', type=str2bool, default=cfg.use_lm)  # whether if to use lm loss in addition to PPO
-	parser.add_argument('--is_policy_optimization', type=str2bool, default=cfg.is_policy_optimization, help="if None then it is set to (self.cfg.use_ppo and not self.cfg.use_lm)")
+	parser.add_argument('--use_ppo', type=str2bool, default=cfg.use_ppo, help="if use_ppo=False, and use_sl is True, then it is just a SL hence a baseline")
+	parser.add_argument('--use_sl', type=str2bool, default=cfg.use_sl)  # whether if to use sl loss in addition to PPO
+	parser.add_argument('--is_policy_optimization', type=str2bool, default=cfg.is_policy_optimization, help="if None then it is set to (self.cfg.use_ppo and not self.cfg.use_sl)")
 	parser.add_argument('--use_true_curr_aspn', type=str2bool, default=cfg.use_true_curr_aspn, help="use true current aspn instead of predicted current aspn. Only could be true when is_policy_optimization")
 	parser.add_argument('--freeze_encoder', type=str2bool, default=cfg.freeze_encoder, help="freeze encoder during training")
 	parser.add_argument('--lm_head_model_action_value', type=str2bool, default=cfg.lm_head_model_action_value)
 	parser.add_argument('--val_loss_coeff', type=float, default=cfg.val_loss_coeff)
 	parser.add_argument('--lm_head_init', type=str2bool, default=cfg.lm_head_init)
-	parser.add_argument('--alternate_epoch', type=str2bool, default=cfg.alternate_epoch, help="alternate lm and rl per epoch or per step")
-	parser.add_argument('--alternate_step_k', type=str2number, default=cfg.alternate_step_k, help="how often to alternate between LM and PPO within a epoch")
+	parser.add_argument('--alternate_epoch', type=str2bool, default=cfg.alternate_epoch, help="alternate SL and RL per epoch or per step")
+	parser.add_argument('--alternate_step_k', type=str2number, default=cfg.alternate_step_k, help="how often to alternate between SL and PPO within a epoch")
 	parser.add_argument('--reward', type=str, default=cfg.reward, help="which reward function to use", choices=["token_error", "sentence_error", "token_sim", "token_prob", "token_contextual_sim", "token_confidence", "zeros"])
 	parser.add_argument('--correct_reward', type=float, default=cfg.correct_reward, help="basically specifies max reward achievable")
 	parser.add_argument('--token_prob_temperature', type=float, default=cfg.token_prob_temperature, help="temperature for token probability")
 	parser.add_argument('--token_prob_scale', type=float, default=cfg.token_prob_scale, help="scale for token probability")
 	parser.add_argument('--token_embedding_path', type=str, default=cfg.token_embedding_path, help="path to token embedding")
-	parser.add_argument('--lm_scale', type=str, default=cfg.lm_scale, help="which lm CE loss scaling to use", choices=["none", "token_error", "sentence_error"])
+	parser.add_argument('--lm_scale', type=str, default=cfg.lm_scale, help="which SL CE loss scaling to use", choices=["none", "token_error", "sentence_error"])
 	parser.add_argument('--special_token_error_scale', type=float, default=cfg.special_token_error_scale, help="relative importance of special tokens")
 	parser.add_argument('--penalize_da_tokens', type=str2bool, default=cfg.penalize_da_tokens)
 	parser.add_argument('--terminal_reward_scale', type=float, default=cfg.terminal_reward_scale)
@@ -251,14 +254,13 @@ def train_ppotod():
 
 	group_name = cfg.exp_group_name
 	dataset = MultiWOZReader(cfg.backbone, cfg.version, base_dir=cfg.data_dir)
-	test_dataset = MultiWOZReader(cfg.backbone, "2.2", base_dir=cfg.data_dir)
 	model = PPOTODModel(cfg, dataset.vocab_size, dataset.tokenizer)
 	kl_model = None
 	if cfg.add_kl_divergence:
 		assert(cfg.kl_ckpt is not None)
 		print(f"loading kl model from {cfg.kl_ckpt}")
 		kl_model = __init_kl_model(cfg, dataset)
-	trainer = PPOLMTrainer(dataset, cfg, model, group_name, run_name=None, test_dataset=test_dataset, kl_model=kl_model)
+	trainer = PPOLMTrainer(dataset, cfg, model, group_name, run_name=None, kl_model=kl_model)
 	return cfg, trainer
 
 
@@ -273,14 +275,13 @@ def train_pgtod():
 
 	group_name = cfg.exp_group_name
 	dataset = MultiWOZReader(cfg.backbone, cfg.version, base_dir=cfg.data_dir)
-	test_dataset = MultiWOZReader(cfg.backbone, "2.2", base_dir=cfg.data_dir)
 	model = PPOTODModel(cfg, dataset.vocab_size, dataset.tokenizer)
 	kl_model = None
 	if cfg.add_kl_divergence:
 		assert(cfg.kl_ckpt is not None)
 		print(f"loading kl model from {cfg.kl_ckpt}")
 		kl_model = __init_kl_model(cfg, dataset)
-	trainer = PGLMTrainer(dataset, cfg, model, group_name, run_name=None, test_dataset=test_dataset, kl_model=kl_model)
+	trainer = PGLMTrainer(dataset, cfg, model, group_name, run_name=None, kl_model=kl_model)
 	return cfg, trainer
 
 
@@ -295,21 +296,20 @@ def train_realrl_tod():
 
 	group_name = cfg.exp_group_name
 	dataset = MultiWOZReader(cfg.backbone, cfg.version, base_dir=cfg.data_dir)
-	test_dataset = MultiWOZReader(cfg.backbone, "2.2", base_dir=cfg.data_dir)
 	model = PPOTODModel(cfg, dataset.vocab_size, dataset.tokenizer)
 	kl_model = None
 	if cfg.add_kl_divergence:
 		assert(cfg.kl_ckpt is not None)
 		print(f"loading kl model from {cfg.kl_ckpt}")
 		kl_model = __init_kl_model(cfg, dataset)
-	trainer = PPORealRLTrainer(dataset, cfg, model, group_name, run_name=None, test_dataset=test_dataset, kl_model=kl_model)
+	trainer = PPORealRLTrainer(dataset, cfg, model, group_name, run_name=None, kl_model=kl_model)
 	return cfg, trainer
 
 
 if __name__ == "__main__":
-	# train with PPO
+	# train with KRLS+PPO
 	cfg, trainer = train_ppotod()
-	# train with PG
+	# train with KRLS+PG
 	# cfg, trainer = train_pgtod()
 	# train with real RL only
 	# cfg, trainer = train_realrl_tod()

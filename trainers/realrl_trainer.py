@@ -30,7 +30,7 @@ logger = get_or_create_logger(__name__)
 class PPORealRLTrainer(PPOLMTrainer):
 	def __init__(self, dataset, cfg, model:PPOTODModel, group_name, run_name, test_dataset=None, ray_reporter=None, kl_model=None):
 		super(PPORealRLTrainer, self).__init__(dataset, cfg, model, group_name, run_name, test_dataset, ray_reporter, kl_model)
-		assert(self.cfg.use_lm == False)
+		assert(self.cfg.use_sl == False)
 		assert(self.cfg.reward == 'zeros')
 		assert(self.cfg.terminal_reward_fn == 'all')
 		return

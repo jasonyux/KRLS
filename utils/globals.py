@@ -82,9 +82,9 @@ class _PPOTOD_CONFIG:
 	precompute_db_path = "model_checkpoints/ppotod/precompute/baseline"
 	kl_ckpt = "model_checkpoints/ppotod/baseline/ckpt-epoch8"
 	kl_loss_coeff = 0.01
-	use_lm = True   # should we use LM Loss in our learning loop?
+	use_sl = True   # should we use LM Loss in our learning loop?
 	use_ppo = True  # if use_ppo is False and use lm is True, then it is basically a baseline with only LM
-	is_policy_optimization = None  # if None then it is set to (self.cfg.use_ppo and not self.cfg.use_lm), else it is set to this value
+	is_policy_optimization = None  # if None then it is set to (self.cfg.use_ppo and not self.cfg.use_sl), else it is set to this value
 	freeze_encoder = False
 	use_gold_prob = 0.0  # if use_gold_prob=0.0, then experience collection is just greedy decoding with ground truth
 	add_gold_demonstrations = False  # if True, then we add gold demonstrations to the experience pool
@@ -192,9 +192,9 @@ class _PGTOD_CONFIG:
 	precompute_db_path = "model_checkpoints/ppotod/precompute/baseline"
 	kl_ckpt = "model_checkpoints/ppotod/baseline/ckpt-epoch8"
 	kl_loss_coeff = 0.01
-	use_lm = True   # should we use LM Loss in our learning loop?
+	use_sl = True   # should we use LM Loss in our learning loop?
 	use_ppo = True  # if use_ppo is False and use lm is True, then it is basically a baseline with only LM
-	is_policy_optimization = None  # if None then it is set to (self.cfg.use_ppo and not self.cfg.use_lm), else it is set to this value
+	is_policy_optimization = None  # if None then it is set to (self.cfg.use_ppo and not self.cfg.use_sl), else it is set to this value
 	freeze_encoder = False
 	use_gold_prob = 0.0  # if use_gold_prob=0.0, then experience collection is just greedy decoding with ground truth
 	add_gold_demonstrations = False  # if True, then we add gold demonstrations to the experience pool

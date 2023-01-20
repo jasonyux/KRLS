@@ -45,7 +45,7 @@ class PPOLMTrainer(MTTODTrainer):
 
 		self.kl_model = kl_model
 		is_policy_optimization = self.cfg.is_policy_optimization
-		self.is_policy_optimization = is_policy_optimization if is_policy_optimization is not None else (self.cfg.use_ppo and not self.cfg.use_lm)
+		self.is_policy_optimization = is_policy_optimization if is_policy_optimization is not None else (self.cfg.use_ppo and not self.cfg.use_sl)
 		if self.cfg.use_bert_score:
 			self._bert_scorer = BERTScorer(
 				model_type="roberta-base", lang="en",
@@ -711,7 +711,7 @@ class PPOLMTrainer(MTTODTrainer):
 
 	@deprecated(reason="can be mostly replaced by train_alternate_k_steps, and num_per_sample is not used")
 	def train_alterante_epoch(self, train_batches, num_steps_per_epoch, optimizer, scheduler):
-		if self.cfg.use_lm:
+		if self.cfg.use_sl:
 			train_iterator = self.iterator.get_data_iterator(train_batches, 'e2e', False, True, -1, resp_use_bspn=self.cfg.resp_use_bspn)
 			for step, batch in enumerate(train_iterator):
 				inputs, labels = batch
@@ -793,7 +793,7 @@ class PPOLMTrainer(MTTODTrainer):
 			_, belief_labels, resp_labels = labels
 
 			# train lm
-			if self.cfg.use_lm:
+			if self.cfg.use_sl:
 				loss, lm_step_outputs = self.lm_step_fn(inputs, *labels)
 
 				if self.cfg.grad_accum_steps > 1:
@@ -841,15 +841,15 @@ class PPOLMTrainer(MTTODTrainer):
 			optimizer.zero_grad()
 
 			lr = scheduler.get_last_lr()[0]
-			if self.cfg.use_lm and self.reporter is not None:
+			if self.cfg.use_sl and self.reporter is not None:
 				self.reporter.step(lm_step_outputs)
 			if self.rl_reporter is not None:
 				self.rl_reporter.step(rl_step_outputs, lr=lr)
 		return
 
 	def train_alternate_k_steps(self, train_batches, num_steps_per_epoch, optimizer, scheduler, k, kl_logits):
-		if not self.cfg.use_lm:
-			logger.warning(f"{self.cfg.use_lm=} and {self.cfg.use_ppo=}")
+		if not self.cfg.use_sl:
+			logger.warning(f"{self.cfg.use_sl=} and {self.cfg.use_ppo=}")
 
 		train_iterator = self.iterator.get_data_iterator(train_batches, 'e2e', False, True, -1, resp_use_bspn=self.cfg.resp_use_bspn)
 		rollout_train_iterator = self.iterator.get_data_iterator(train_batches, 'e2e', False, True, -1, resp_use_bspn=self.cfg.resp_use_bspn)
@@ -861,7 +861,7 @@ class PPOLMTrainer(MTTODTrainer):
 			inputs, labels = batch
 			_, belief_labels, _ = labels
 
-			if self.cfg.use_lm:
+			if self.cfg.use_sl:
 				loss, lm_step_outputs = self.lm_step_fn(inputs, *labels)
 
 				if self.cfg.grad_accum_steps > 1:
@@ -926,7 +926,7 @@ class PPOLMTrainer(MTTODTrainer):
 			optimizer.zero_grad()
 
 			lr = scheduler.get_last_lr()[0]
-			if self.cfg.use_lm and self.reporter is not None:
+			if self.cfg.use_sl and self.reporter is not None:
 				self.reporter.step(lm_step_outputs)
 			if self.rl_reporter is not None:
 				self.rl_reporter.step(rl_step_outputs, lr=lr)
@@ -1004,7 +1004,7 @@ class PPOLMTrainer(MTTODTrainer):
 	def __compute_num_training_steps(self, num_training_steps_per_epoch):
 		if not self.cfg.use_ppo:  # baseline
 			return num_training_steps_per_epoch
-		if not self.cfg.use_lm:  # only PPO
+		if not self.cfg.use_sl:  # only PPO
 			return num_training_steps_per_epoch * self.cfg.ppo_epoch
 		return num_training_steps_per_epoch  # we do not step PPO during train_alternate_k_steps
 	
