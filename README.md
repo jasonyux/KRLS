@@ -20,9 +20,16 @@ If you want to preprocess the dataset by yourself, we used the same preprocessin
 
 > Note: we track our experiments using `wandb` on [Weights & Biases](https://wandb.ai/). We highly recommend you to setup `wandb` to make sure our code works properly.
 
+## Dependencies
+
+If you encounter some problems with running our code with your existing setup, try the following:
+```
+transformers==4.28.0, sentencepiece==0.1.96, torch==1.13.0, numpy==1.20.3
+```
+
 ## Pretrained Weights
 
-We use [GODEL-base](https://github.com/microsoft/GODEL) as pretrained weights, which you can download from the official github repo or from here [HERE](https://drive.google.com/file/d/18rtiS9twUVaecl1ycELskdcXwEW8Kr2T/view?usp=sharing). Place the downloaded weights under the `model_checkpoints` folder like this:
+We use [GODEL-base](https://github.com/microsoft/GODEL) as pretrained weights, which you can download from the official github repo (*which may change/be updated by the corresponding authors*) or directly from here [HERE](https://drive.google.com/file/d/18rtiS9twUVaecl1ycELskdcXwEW8Kr2T/view?usp=sharing) from our own google drive. Place the downloaded weights under the `model_checkpoints` folder like this:
 
 ```bash
 model_checkpoints
